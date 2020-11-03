@@ -51,6 +51,8 @@ jobs:
       # ServiceDirectory references must get passed down by the caller as variable references
       - name: ServiceDirectory
         value: ${{ parameters.ServiceDirectory }}
+      - name: AdditionalTestArguments
+        value: $[ coalesce(variables['AdditionalTestArguments'], ';') ]
 
     timeoutInMinutes: ${{ parameters.TimeoutInMinutes }}
 
@@ -75,17 +77,17 @@ jobs:
           ServiceDirectory: '${{ parameters.ServiceDirectory }}'
           SubscriptionConfiguration: ${{ parameters.CloudConfig.SubscriptionConfiguration }}
 
-      - pwsh: |
-          Set-PsDebug -Trace 1
-
-          dotnet test eng/service.proj `
-          --framework $(TestTargetFramework) `
-          --filter "TestCategory!=Manually" `
-          --logger "trx" `
-          --logger:"console;verbosity=normal" `
-          /p:ServiceDirectory=${{ parameters.ServiceDirectory }} `
-          /p:IncludeSrc=false /p:IncludeSamples=false `
-          /p:BuildInParallel=${{ parameters.BuildInParallel }} $(AdditionalTestArguments)
+      - pwsh: >
+          Set-PsDebug -Trace 1 &&
+          dotnet test eng/service.proj
+          --framework $(TestTargetFramework)
+          --filter "TestCategory!=Manually"
+          --logger "trx"
+          --logger:"console;verbosity=normal"
+          /p:ServiceDirectory=${{ parameters.ServiceDirectory }}
+          /p:IncludeSrc=false /p:IncludeSamples=false
+          /p:BuildInParallel=${{ parameters.BuildInParallel }}
+          $(AdditionalTestArguments)
 
         displayName: "Build & Test (all tests for $(TestTargetFramework))"
         env:
