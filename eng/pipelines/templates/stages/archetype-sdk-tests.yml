@@ -81,14 +81,7 @@ parameters:
 - name: PlatformPreSteps
   type: object
   default:
-    - script: sudo ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
-      displayName: Bypass local DNS server to workaround issue resolving cognitiveservices names
-      condition: |
-        and(
-          succeededOrFailed(),
-          eq(variables['OSVmImage'], 'ubuntu-18.04'),
-          eq(variables['Agent.JobName'], 'Linux_NetCore')
-        )
+    - template: ../../../../eng/common/pipelines/templates/steps/bypass-local-dns.yml
 - name: PlatformPostSteps
   type: object
   default:
@@ -111,7 +104,7 @@ parameters:
 
 stages:
 - ${{ each cloud in parameters.CloudConfig }}:
-  - ${{ if contains(parameters.Clouds, cloud.key) }}:
+  - ${{ if or(contains(parameters.Clouds, cloud.key), eq(variables.RunAllClouds, true)) }}:
     - stage: ${{ cloud.key }}
       dependsOn: []
       jobs:
