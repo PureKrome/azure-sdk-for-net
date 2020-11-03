@@ -51,7 +51,7 @@ jobs:
       # ServiceDirectory references must get passed down by the caller as variable references
       - name: ServiceDirectory
         value: ${{ parameters.ServiceDirectory }}
-      - name: AdditionalTestArguments
+      - name: AdditionalTestArgs
         value: $[ coalesce(variables['AdditionalTestArguments'], ';') ]
 
     timeoutInMinutes: ${{ parameters.TimeoutInMinutes }}
@@ -87,7 +87,7 @@ jobs:
           /p:ServiceDirectory=${{ parameters.ServiceDirectory }}
           /p:IncludeSrc=false /p:IncludeSamples=false
           /p:BuildInParallel=${{ parameters.BuildInParallel }}
-          $(AdditionalTestArguments)
+          $(AdditionalTestArgs)
 
         displayName: "Build & Test (all tests for $(TestTargetFramework))"
         env:
